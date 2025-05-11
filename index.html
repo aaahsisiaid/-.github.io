@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>指定座標の地図表示</title>
+  <title>座標地図</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -14,20 +14,15 @@
 <body>
   <div id="map"></div>
   <script>
-    function getLatLngFromURL() {
-      const path = window.location.pathname.slice(1); // 先頭の「/」を削除
-      const parts = path.split(",");
-      if (parts.length === 2) {
-        const lat = parseFloat(parts[0]);
-        const lng = parseFloat(parts[1]);
-        if (!isNaN(lat) && !isNaN(lng)) {
-          return [lat, lng];
-        }
-      }
+    function getLatLngFromQuery() {
+      const params = new URLSearchParams(location.search);
+      const lat = parseFloat(params.get('lat'));
+      const lng = parseFloat(params.get('lng'));
+      if (!isNaN(lat) && !isNaN(lng)) return [lat, lng];
       return null;
     }
 
-    const coords = getLatLngFromURL();
+    const coords = getLatLngFromQuery();
     if (coords) {
       const map = L.map('map').setView(coords, 15);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -35,7 +30,7 @@
       }).addTo(map);
       L.marker(coords).addTo(map).bindPopup(`座標: ${coords[0]}, ${coords[1]}`).openPopup();
     } else {
-      document.body.innerHTML = "<p style='text-align:center; padding:2em;'>座標が不正です。</p>";
+      document.body.innerHTML = "<p style='text-align:center; padding:2em;'>URLに緯度と経度を指定してください。例: ?lat=35.68&lng=139.76</p>";
     }
   </script>
 </body>
